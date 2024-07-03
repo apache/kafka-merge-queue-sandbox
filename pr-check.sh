@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for FILE in `git diff-index --name-status main -- | cut -c3-` ; do
+for FILE in `git diff-index --name-status origin/main -- | cut -c3-` ; do
     if grep -q 'FAIL' "$FILE"
     then
         echo $FILE ' contains FAIL!'
