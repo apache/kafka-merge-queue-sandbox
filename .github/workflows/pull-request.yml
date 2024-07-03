@@ -1,7 +1,8 @@
-name: Validate PR before adding to merge queue
+name: Validate PR
 
 on:
   pull_request:
+  merge_queue:
 
 jobs:
   validate-pr:
@@ -16,5 +17,5 @@ jobs:
         pwd
         tree -a -I '.git'
         git status
-    - name: Run fast CI (emulated by a short sleep)
+    - name: Validate files
       run: ./pr-check.sh
