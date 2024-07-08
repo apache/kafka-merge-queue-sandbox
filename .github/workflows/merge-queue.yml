@@ -17,4 +17,4 @@ jobs:
         tree -a -I '.git'
         git status
     - name: Validate files
-      run: ./pr-check.sh
+      run: ./queue-check.sh
