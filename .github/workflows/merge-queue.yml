@@ -1,4 +1,4 @@
-name: Validate PR
+name: Validate Patch
 
 on:
   pull_request:
@@ -20,4 +20,4 @@ jobs:
         tree -a -I '.git'
         git status
     - name: Validate files
-      run: ./queue-check.sh
+      run: sleep 5 && ./queue-check.sh
