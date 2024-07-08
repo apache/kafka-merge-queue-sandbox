@@ -16,5 +16,5 @@ jobs:
         pwd
         tree -a -I '.git'
         git status
-    - name: Validate files
+    - name: Run tests and such
       run: ./pr-check.sh
