@@ -1,4 +1,4 @@
-name: Validate PRs in merge queue
+name: Validate PR
 
 on:
   pull_request:
