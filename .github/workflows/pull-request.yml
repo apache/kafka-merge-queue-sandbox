@@ -1,4 +1,4 @@
-name: Validate PR
+name: Run Tests
 
 on:
   pull_request:
@@ -17,4 +17,4 @@ jobs:
         tree -a -I '.git'
         git status
     - name: Run tests and such
-      run: ./pr-check.sh
+      run: sleep 60 && ./pr-check.sh
