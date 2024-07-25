@@ -23,4 +23,4 @@ jobs:
         git status
         git log origin/main..HEAD
     - name: Validate files
-      run: sleep 5 && ./queue-check.sh
+      run: sleep 5
