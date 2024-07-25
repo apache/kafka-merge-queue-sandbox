@@ -1,4 +1,4 @@
-name: Validate PR
+name: Validate Patch
 
 on:
   pull_request:
@@ -18,6 +18,9 @@ jobs:
       run: | 
         pwd
         tree -a -I '.git'
+        echo "Action: ${{ github.event.action }}"
+        echo "Sender: ${{ github.event.sender.login }}"
         git status
+        git log origin/main..HEAD
     - name: Validate files
-      run: ./queue-check.sh
+      run: sleep 5 && ./queue-check.sh
