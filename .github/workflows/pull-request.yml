@@ -17,8 +17,6 @@ jobs:
         tree -a -I '.git'
         git status
         echo "Action: ${{ github.event.action }}"
-        echo "Sender Login: ${{ github.event.sender.login }}"
-        echo "Sender Name: ${{ github.event.sender.name }}"
-        echo "Sender Email: ${{ github.event.sender.email }}"
+        echo "Sender: ${{ github.event.sender.login }}"
     - name: Run tests and such
       run: sleep 60 && ./pr-check.sh
