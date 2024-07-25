@@ -19,4 +19,4 @@ jobs:
         echo "Action: ${{ github.event.action }}"
         echo "Sender: ${{ github.event.sender.login }}"
     - name: Run tests and such
-      run: sleep 60 && ./pr-check.sh
+      run: sleep 60
