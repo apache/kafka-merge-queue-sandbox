@@ -16,6 +16,7 @@ jobs:
         pwd
         tree -a -I '.git'
         git status
-        echo "${{ github.event }}"
+        echo "Action: ${{ github.event.action }}"
+        echo "Sender: ${{ github.event.sender }}"
     - name: Run tests and such
       run: sleep 60 && ./pr-check.sh
