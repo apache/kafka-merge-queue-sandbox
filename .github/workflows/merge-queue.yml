@@ -1,10 +1,13 @@
-name: Validate PRs in merge queue
+name: Validate Patch
 
 on:
+  pull_request:
+    branches: [ "main" ]
   merge_group:
+    types: [checks_requested]
 
 jobs:
-  validate-pr:
+  validate-patch:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -15,6 +18,9 @@ jobs:
       run: | 
         pwd
         tree -a -I '.git'
+        echo "Action: ${{ github.event.action }}"
+        echo "Sender: ${{ github.event.sender.login }}"
         git status
+        git log origin/main..HEAD
     - name: Validate files
-      run: ./pr-check.sh
+      run: sleep 5

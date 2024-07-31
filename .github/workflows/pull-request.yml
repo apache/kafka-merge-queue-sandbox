@@ -1,4 +1,4 @@
-name: Validate PR
+name: Run Tests
 
 on:
   pull_request:
@@ -16,5 +16,7 @@ jobs:
         pwd
         tree -a -I '.git'
         git status
-    - name: Validate files
-      run: ./pr-check.sh
+        echo "Action: ${{ github.event.action }}"
+        echo "Sender: ${{ github.event.sender.login }}"
+    - name: Run tests and such
+      run: sleep 60

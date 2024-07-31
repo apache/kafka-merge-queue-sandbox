@@ -23,3 +23,8 @@ github:
     merge:   true
     # disable rebase button:
     rebase:  true
+
+notifications:
+  commits:      commits@kafka.apache.org
+  issues:       jira@kafka.apache.org
+  pullrequests: jira@kafka.apache.org
