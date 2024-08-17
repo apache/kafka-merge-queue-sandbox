@@ -18,7 +18,7 @@ pip install Flask
 
 Now, we can start the SMEE client to start receiving events from GitHub.
 ```
-smee -u https://smee.io/wfaiAis5XU4SHXrC -P /webhook -t http://localhost:3000
+smee -u https://smee.io/wfaiAis5XU4SHXrC -t http://localhost:3000/webhook
 ```
 
 This will receive events from the SMEE proxy which this repository is sending its webhooks to. 
