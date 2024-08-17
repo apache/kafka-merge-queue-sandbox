@@ -4,9 +4,8 @@ app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def webhook_receiver():
-    data = request.json
-    event = data.get("event")
-    payload = data.get("payload")
+    payload = request.json
+    event = request.headers.get("X-Github-Event")
     action = payload.get("action")
 
     if event == "pull_request" and action == "enqueued":
@@ -32,7 +31,7 @@ def webhook_receiver():
         head = merge_group.get("head_sha")
         print(f"User {login} merged commits after {base} up until {head} via merge queue")
     else:
-        print(f"Received webhook event {event} with action {actio}: {payload}")
+        print(f"Received webhook event {event} with action {action}")
 
     return jsonify({'message': 'Webhook received successfully'}), 200
         
