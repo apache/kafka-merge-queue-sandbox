@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify
-from yaml import load, dump
-from yaml import Loader, Dumper
+import asfquart
 
-app = Flask(__name__)
+from quart import request, jsonify
+from yaml import load
+from yaml import Loader
+
+app = asfquart.construct("merge-queue-webhook")
 
 with open("config.yml") as fp:
     config = load(fp, Loader=Loader)
@@ -11,8 +13,8 @@ gh_user_map = config.get("gh-user-map", {})
 
 
 @app.route('/webhook', methods=['POST'])
-def webhook_receiver():
-    payload = request.json
+async def webhook_receiver():
+    payload = await request.get_json()
     event = request.headers.get("X-Github-Event")
     action = payload.get("action")
 
@@ -48,4 +50,4 @@ def webhook_receiver():
         
 
 if __name__ == '__main__':
-    app.run(debug=True, host='localhost', port=3000)
+    asfquart.APP.run(port=3000)

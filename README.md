@@ -13,8 +13,11 @@ We need a Python virtualenv for running a local server.
 ```
 python3 -m venv venv
 source venv/bin/activate
-pip install Flask
 ```
+
+Download the quart framework https://github.com/apache/infrastructure-asfquart/ and install it
+into the virtualenv we just made.
+
 
 Now, we can start the SMEE client to start receiving events from GitHub.
 ```
