@@ -51,5 +51,3 @@ The three JSON payloads located in webhook-payloads require a cooresponding `X-G
 * pull_request_dequeued: `X-Github-Event: pull_request`
 * pull_request_enqueued: `X-Github-Event: pull_request`
 * merge_group: `X-Github-Event: merge_group`
-
-
