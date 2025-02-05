@@ -1,4 +1,4 @@
-# MERGE QUEUE TESTING ONLY
+# Merge Queue Testing for Apache Kafka
 
 The purpose of this repository is to evaluate Github's merge queue feature
 in the context of an Apache project. 
