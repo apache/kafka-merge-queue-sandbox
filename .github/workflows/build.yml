@@ -31,50 +31,6 @@ on:
         type: boolean
 
 jobs:
-  load-catalog:
-    runs-on: ubuntu-latest
-    name: Load Test Catalog
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-
-      - name: Checkout test-catalog
-        uses: actions/checkout@v4
-        with:
-          ref: 'test-catalog'
-          persist-credentials: false
-          fetch-depth: 100  # Needs to be large enough to ensure we can fetch N days ago
-          path: test-catalog
-
-      - name: Checkout catalog at earlier date
-        run: |
-          cd test-catalog
-          SHA=$(git rev-list -1 --before 7.days.ago origin/test-catalog)
-          echo $SHA
-          git switch --detach $SHA
-          git show --no-patch
-
-      - name: Setup Python
-        uses: ./.github/actions/setup-python
-
-      # Prior to this step, we don't expect any errors. For the rest of this "load-catalog" job, we need to ensure
-      # we do not fail as this will fail the overall workflow.
-      - name: Combine Catalog into single file
-        id: combine-catalog
-        continue-on-error: true
-        run: |
-          python .github/scripts/format-test-catalog.py --path "test-catalog/test-catalog/**/*.yaml"
-
-      - name: Archive Combined Test Catalog
-        if: steps.combine-catalog.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: combined-test-catalog
-          path: combined-test-catalog.txt
-          compression-level: 9
-
   validate:
     runs-on: ubuntu-latest
     name: Compile and Check Java
@@ -145,7 +101,7 @@ jobs:
           fi
 
   test:
-    needs: [validate, load-catalog]
+    needs: [validate]
     if: ${{ ! needs.validate.outputs.is-draft }}
     runs-on: ubuntu-latest
     strategy:
@@ -170,22 +126,13 @@ jobs:
           gradle-cache-write-only: ${{ inputs.is-trunk }}
           develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
-      # If the load-catalog job failed, we won't be able to download the artifact. Since we don't want this to fail
-      # the overall workflow, so we'll continue here without a test catalog.
-      - name: Load Test Catalog
-        id: load-test-catalog
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: combined-test-catalog
-
       - name: JUnit Quarantined Tests
         id: junit-quarantined-test
         uses: ./.github/actions/run-gradle
         with:
           test-task: quarantinedTest
           timeout-minutes: 180
-          test-catalog-path: ${{ steps.load-test-catalog.outputs.download-path }}/combined-test-catalog.txt
+          test-catalog-path: missing.txt
           build-scan-artifact-name: build-scan-quarantined-test-${{ matrix.java }}
 
       - name: JUnit Tests
@@ -194,7 +141,7 @@ jobs:
         with:
           test-task: test
           timeout-minutes: 180  # 3 hours
-          test-catalog-path: ${{ steps.load-test-catalog.outputs.download-path }}/combined-test-catalog.txt
+          test-catalog-path: missing.txt
           build-scan-artifact-name: build-scan-test-${{ matrix.java }}
 
       - name: Archive JUnit HTML reports
@@ -235,50 +182,3 @@ jobs:
           THREAD_DUMP_URL: ${{ steps.thread-dump-upload-artifact.outputs.artifact-url }}
           GRADLE_TEST_EXIT_CODE: ${{ steps.junit-test.outputs.gradle-exitcode }}
           GRADLE_QUARANTINED_TEST_EXIT_CODE: ${{ steps.junit-quarantined-test.outputs.gradle-exitcode }}
-
-      - name: Archive Test Catalog
-        if: ${{ always() && matrix.java == '23' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-catalog
-          path: test-catalog
-          compression-level: 9
-          if-no-files-found: ignore
-
-  update-test-catalog:
-    name: Update Test Catalog
-    needs: test
-    if: ${{ always() && inputs.is-trunk && needs.test.outputs.timed-out == 'false' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Test Catalog
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true  # Needed to commit and push later
-          ref: test-catalog
-      - name: Reset Catalog
-        run: |
-          rm -rf test-catalog
-      - name: Download Test Catalog
-        uses: actions/download-artifact@v4
-        with:
-          name: test-catalog
-          path: test-catalog
-      - name: Push Test Catalog
-        # Git user.name and user.email come from https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
-        env:
-          COMMIT_MSG: |
-            Update test catalog data for GHA workflow run ${{ github.run_id }}
-            
-            Commit: https://github.com/apache/kafka/commit/${{ github.sha }}
-            GitHub Run: https://github.com/apache/kafka/actions/runs/${{ github.run_id }}
-        run: |
-          pwd
-          ls -R
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add test-catalog
-          git diff --quiet && git diff --staged --quiet || git commit -m "$COMMIT_MSG"
-          git push
