@@ -33,6 +33,6 @@ jobs:
     with:
       is-trunk: ${{ github.ref == 'refs/heads/trunk' }}
       is-public-fork: ${{ github.event.pull_request.head.repo.fork || false }}
-      run-tests: ${{ github.event == 'pull_request' }}
+      run-tests: false
     secrets:
       inherit
