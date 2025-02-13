@@ -29,6 +29,23 @@ concurrency:
 
 jobs:
   validate-patch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Display info
+      run: | 
+        pwd
+        tree -a -I '.git'
+        echo "Action: ${{ github.event.action }}"
+        echo "Sender: ${{ github.event.sender.login }}"
+        git status
+        git log origin/main..HEAD
+    - name: Validate files
+      run: sleep 5
+  build:
     uses: ./.github/workflows/build.yml
     with:
       is-trunk: ${{ github.ref == 'refs/heads/trunk' }}
