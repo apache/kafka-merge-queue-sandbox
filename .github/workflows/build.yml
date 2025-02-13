@@ -29,6 +29,9 @@ on:
         description: "Is this CI run from a public fork?"
         default: true
         type: boolean
+      run-tests:
+        default: true
+        type: boolean
 
 jobs:
   validate:
@@ -102,7 +105,7 @@ jobs:
 
   test:
     needs: [validate]
-    if: ${{ ! needs.validate.outputs.is-draft }}
+    if: ${{ ! needs.validate.outputs.is-draft && inputs.run-tests }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
