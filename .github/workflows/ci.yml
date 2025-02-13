@@ -31,20 +31,54 @@ jobs:
   validate-patch:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Display info
-      run: | 
-        pwd
-        tree -a -I '.git'
-        echo "Action: ${{ github.event.action }}"
-        echo "Sender: ${{ github.event.sender.login }}"
-        git status
-        git log origin/main..HEAD
-    - name: Validate files
-      run: sleep 5
+      - name: Env
+        run: printenv
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup Python
+        uses: ./.github/actions/setup-python
+      - name: Setup Gradle
+        uses: ./.github/actions/setup-gradle
+        with:
+          java-version: 23
+          gradle-cache-read-only: true
+          gradle-cache-write-only: false
+          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
+      - name: Compile and validate
+        env:
+          SCAN_ARG: '--no-scan'
+        # Gradle flags
+        # --build-cache:  Let Gradle restore the build cache
+        # --info:         For now, we'll generate lots of logs while setting up the GH Actions
+        # --scan:         Publish the build scan. This will only work on PRs from apache/kafka and trunk
+        # --no-scan:      For public fork PRs, we won't attempt to publish the scan
+        run: |
+          ./gradlew --build-cache --info $SCAN_ARG check siteDocTar -x test
+      - name: Annotate checkstyle errors
+        if: failure()
+        run: python .github/scripts/checkstyle.py
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+      - name: Annotate Rat errors
+        if: failure()
+        run: python .github/scripts/rat.py
+        env:
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+      - name: Check generated documentation
+        # Check if there are any empty files under ./site-docs/generated, If any empty files are found, print an error 
+        # message and list the empty files
+        run: |
+          tar zxvf core/build/distributions/kafka_2.13-$(./gradlew properties | grep version: | awk '{print $NF}' | head -n 1)-site-docs.tgz
+          if find ./site-docs/generated -type f -exec grep -L "." {} \; | grep -q "."; then
+            echo "One or more documentation files are empty!" >&2
+            find ./site-docs/generated -type f -exec grep -L "." {} \; >&2
+            exit 1
+          fi
+
   build:
     uses: ./.github/workflows/build.yml
     with:
