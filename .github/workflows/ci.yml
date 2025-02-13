@@ -13,26 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: CI
+name: Validate Patch
 
 on:
-  push:
-    branches:
-      - 'trunk'
-      - '4.0'
-
-  schedule:
-    - cron: '0 0 * * 6,0'    # Run on Saturday and Sunday at midnight UTC
-
   pull_request:
     types: [ opened, synchronize, ready_for_review, reopened ]
-    branches:
-      - 'trunk'
-      - '4.0'
+    branches: ["main"]
 
   merge_group:
-    types: 
-      - checks_requested
+    types: [checks_requested]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -40,24 +29,6 @@ concurrency:
 
 jobs:
   validate-patch:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Display info
-      run: |
-        pwd
-        tree -a -I '.git'
-        echo "Action: ${{ github.event.action }}"
-        echo "Sender: ${{ github.event.sender.login }}"
-        git status
-        git log origin/main..HEAD
-    - name: Validate files
-      run: sleep 5
-
-  build:
     uses: ./.github/workflows/build.yml
     with:
       is-trunk: ${{ github.ref == 'refs/heads/trunk' }}
