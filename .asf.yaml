@@ -15,14 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
+meta:
+  nextgen: true
+
 github:
   enabled_merge_buttons:
-    # enable squash button:
     squash:  true
-    # enable merge button:
-    merge:   true
-    # disable rebase button:
-    rebase:  true
+    squash_commit_message: PR_TITLE_AND_DESC
+    merge:   false
+    rebase:  false
 
 notifications:
   commits:      commits@kafka.apache.org
