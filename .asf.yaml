@@ -18,7 +18,6 @@
 meta:
   nextgen: true
 
-
 github:
   enabled_merge_buttons:
     squash:  true
