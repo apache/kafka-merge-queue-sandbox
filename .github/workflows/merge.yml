@@ -13,16 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Validate Patch
+name: Merge Patch
 
 on:
-  pull_request:
-    types: [ opened, synchronize, ready_for_review, reopened ]
-    branches: ["main"]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+  merge_group:
+    types: [checks_requested]
 
 jobs:
   validate-patch:
@@ -36,12 +31,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-
-  build:
-    uses: ./.github/workflows/build.yml
-    with:
-      is-trunk: ${{ github.ref == 'refs/heads/trunk' }}
-      is-public-fork: ${{ github.event.pull_request.head.repo.fork || false }}
-      run-tests: false
-    secrets:
-      inherit
+      - name: Setup Python
+        uses: ./.github/actions/setup-python
+      - name: Setup Gradle
+        uses: ./.github/actions/setup-gradle
+        with:
+          java-version: 23
+          gradle-cache-read-only: true
+          gradle-cache-write-only: false
+          develocity-access-key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
