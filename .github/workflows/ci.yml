@@ -25,6 +25,18 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
+  validate-patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Env
+        run: printenv
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
   build:
     uses: ./.github/workflows/build.yml
     with:
