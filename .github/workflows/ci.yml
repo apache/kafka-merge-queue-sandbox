@@ -37,11 +37,3 @@ jobs:
         with:
           persist-credentials: false
 
-  build:
-    uses: ./.github/workflows/build.yml
-    with:
-      is-trunk: ${{ github.ref == 'refs/heads/trunk' }}
-      is-public-fork: ${{ github.event.pull_request.head.repo.fork || false }}
-      run-tests: false
-    secrets:
-      inherit
