@@ -37,8 +37,6 @@ jobs:
         run: |
           echo "Status"
           git status
-          echo "Show"
-          git show
           echo "Log"
           git log $BASE_SHA..HEAD
           echo "Amend"
