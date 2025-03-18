@@ -38,8 +38,11 @@ jobs:
           echo "Status"
           git status
           echo "Log"
-          git log $BASE_SHA..HEAD
+          git log HEAD..$BASE_SHA
+          git log --oneline | head -n 100
           echo "Amend"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit --amend --trailer "Reviewer: David Arthur <mumrah@gmail>"
       - name: Setup Python
         uses: ./.github/actions/setup-python
