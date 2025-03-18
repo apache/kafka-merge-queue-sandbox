@@ -43,7 +43,7 @@ jobs:
           echo "Amend"
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit --amend --trailer "Reviewer: David Arthur <mumrah@gmail>"
+          git commit --amend --no-edit --trailer "Reviewer: David Arthur <mumrah@gmail>"
       - name: Setup Python
         uses: ./.github/actions/setup-python
       - name: Setup Gradle
